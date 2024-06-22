@@ -1,7 +1,6 @@
 const Category = require("../models/Category");
 
 const createNewCategory = async (req, res) => {
-  //req.user get the user because of passport.authentication
   const currentUser = req.user;
   const { name, thumbnail } = req.body;
   if (!name) {

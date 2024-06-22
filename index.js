@@ -4,7 +4,6 @@ const cors = require("cors");
 const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
 const db = require("./config/mongodb/index");
-const passport = require("./config/passportJWT/index");
 //Sử dụng từ khoá use (app.use), express hiểu là sử dụng middleware => nên config middleware trước routes
 
 //Require Routes
@@ -25,9 +24,6 @@ app.use(cookieParser());
 //config body-parser
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-
-//Setup middleware passport-jwt
-// passport.setupPassport();
 
 //Setup cors
 app.use(

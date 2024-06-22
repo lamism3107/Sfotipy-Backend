@@ -2,7 +2,6 @@ const Playlist = require("../models/Playlist");
 const User = require("../models/User");
 
 const createNewPlaylist = async (req, res) => {
-  //req.user get the user because of passport.authentication
   const currentUser = req.user;
   const { name, thumbnail, songs, isAlbum, artist } = req.body;
   if (!name || !thumbnail || !songs) {

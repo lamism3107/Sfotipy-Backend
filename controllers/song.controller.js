@@ -2,7 +2,6 @@ const Song = require("../models/Song");
 const User = require("../models/User");
 
 const createNewSong = async (req, res) => {
-  //req.user get the user because of passport.authentication
   const { name, thumbnail, songURL, language } = req.body;
   if (!name || !thumbnail || !songURL || !language) {
     return res.status(301).json({
