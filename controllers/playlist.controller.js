@@ -146,7 +146,7 @@ async function deletePlaylist(req, res) {
         data: deletedPlaylist,
       });
     } else {
-      return res.status(200).json({
+      return res.status(404).json({
         success: false,
         message: "Data not found!",
         data: null,
@@ -155,6 +155,7 @@ async function deletePlaylist(req, res) {
   } catch (e) {
     return res.status(500).json({
       success: false,
+      data: null,
       message: e.message,
     });
   }

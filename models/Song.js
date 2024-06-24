@@ -10,6 +10,25 @@ const Song = new mongoose.Schema({
     type: String,
     required: true,
   },
+  mainArtist: [
+    {
+      type: ObjectId,
+      ref: "user",
+      required: true,
+    },
+  ],
+  composer: [
+    {
+      type: ObjectId,
+      ref: "user",
+    },
+  ],
+  producer: [
+    {
+      type: ObjectId,
+      ref: "user",
+    },
+  ],
   songURL: {
     type: String,
     required: true,
@@ -21,11 +40,13 @@ const Song = new mongoose.Schema({
   album: {
     type: ObjectId,
     ref: "playlist",
+    default: "",
   },
-  artist: {
-    type: ObjectId,
-    ref: "user",
+
+  playCount: {
+    type: Number,
     required: true,
+    default: 0,
   },
   categoryList: [{ type: ObjectId, ref: "category" }],
   createdAt: { type: Date, default: Date.now },
