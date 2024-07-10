@@ -31,7 +31,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(
   cors({
     // origin: "http://localhost:3000",
-    origin: "https://sfotipy-frontend.vercel.app/", //Chan tat ca cac domain khac ngoai domain nay
+    origin: "https://sfotipy-frontend.vercel.app", //Chan tat ca cac domain khac ngoai domain nay
     credentials: true, //Để bật cookie HTTP qua CORS
   })
 );
