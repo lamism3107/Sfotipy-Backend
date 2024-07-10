@@ -18,3 +18,4 @@ router.get(
   authMiddleware.verifyAccessToken,
   categoryController.getAllCategries
 );
+module.exports = router;

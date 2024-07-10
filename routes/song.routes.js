@@ -3,7 +3,11 @@ const router = express.Router();
 const songController = require("../controllers/song.controller");
 const authMiddleware = require("../utils/authMiddleware");
 
-router.post("/", authMiddleware.verifyArtist, songController.createNewSong);
+router.post(
+  "/",
+  authMiddleware.verifyAccessToken,
+  songController.createNewSong
+);
 router.get("/mySongs", authMiddleware.verifyArtist, songController.getMySongs);
 
 router.get(

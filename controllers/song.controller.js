@@ -2,7 +2,8 @@ const Song = require("../models/Song");
 const User = require("../models/User");
 
 const createNewSong = async (req, res) => {
-  const { name, thumbnail, songURL, language } = req.body;
+  const { name, thumbnail, songURL, codeType, language, categoryList } =
+    req.body;
   if (!name || !thumbnail || !songURL || !language) {
     return res.status(301).json({
       success: false,
@@ -10,11 +11,19 @@ const createNewSong = async (req, res) => {
       data: null,
     });
   }
-  let artist = "";
-  console.log("check user id:", req.user.id);
-  artist = req.user.id;
+  let owner = req.user.id;
+  let artists = [req.user.id];
 
-  const songDetails = { name, thumbnail, songURL, language, artist };
+  const songDetails = {
+    name,
+    thumbnail,
+    codeType,
+    songURL,
+    artists,
+    language,
+    owner,
+    categoryList,
+  };
   const createdSong = await Song.create(songDetails);
   return res.status(200).json({
     success: true,
@@ -27,7 +36,7 @@ const getMySongs = async (req, res) => {
   const currentUser = req.user;
   console.log(currentUser);
   const songs = await Song.find({
-    artist: req.user.id,
+    owner: currentUser.id,
   });
   return res.status(200).json({
     success: true,

@@ -2,6 +2,7 @@ const Playlist = require("../models/Playlist");
 const User = require("../models/User");
 const Song = require("../models/Song");
 const admin = require("../config/firebase/firebase.config");
+const SongModel = require("../models/Song");
 
 const getAllUsers = async (req, res) => {
   try {
@@ -96,6 +97,7 @@ const createNewUserByGoogleAccount = async (decodeValue, req, res) => {
     ggId: decodeValue.user_id,
     email_verified: decodeValue.email_verified,
     auth_time: decodeValue.auth_time,
+    codeType: "user",
   });
   try {
     const savedUser = await newUser.save();
@@ -178,7 +180,7 @@ const getAllPlaylistsOfUser = async (req, res) => {
       message: "Invalid id, user not found",
       data: null,
     });
-  await Playlist.find({ owner: userId, isAlbum: false })
+  await Playlist.find({ owner: userId, codeType: "Playlist" })
     .then((playlist) => {
       return res.status(200).json({
         success: true,
@@ -204,7 +206,7 @@ const getAllAlbumsOfUser = async (req, res) => {
       message: "Invalid id, user not found",
       data: null,
     });
-  await Playlist.find({ owner: userId, isAlbum: true })
+  await Playlist.find({ owner: userId, codeType: "Album" })
     .then((playlist) => {
       return res.status(200).json({
         success: true,
@@ -220,6 +222,32 @@ const getAllAlbumsOfUser = async (req, res) => {
       });
     });
 };
+
+const getAllSongsOfUser = async (req, res) => {
+  const userId = req.params.id;
+  const user = await User.findById(userId);
+  if (!user)
+    return res.status(304).json({
+      success: false,
+      message: "Invalid id, user not found",
+      data: null,
+    });
+  await SongModel.find({ owner: userId })
+    .then((playlist) => {
+      return res.status(200).json({
+        success: true,
+        message: "Get all playlist of user successfully",
+        data: playlist,
+      });
+    })
+    .catch((err) => {
+      return res.status(500).json({
+        success: false,
+        message: err.message,
+        data: null,
+      });
+    });
+};
 module.exports = {
   getAllUsers,
   createNewUserByGoogleAccount,
@@ -229,4 +257,5 @@ module.exports = {
   getUserById,
   getAllPlaylistsOfUser,
   getAllAlbumsOfUser,
+  getAllSongsOfUser,
 };

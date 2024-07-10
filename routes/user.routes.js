@@ -23,5 +23,10 @@ router.get(
   authMiddleware.verifyArtist,
   userController.getAllAlbumsOfUser
 );
+router.get(
+  "/:id/songs",
+  authMiddleware.verifyAccessToken,
+  userController.getAllSongsOfUser
+);
 
 module.exports = router;

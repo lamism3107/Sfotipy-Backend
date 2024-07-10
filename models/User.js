@@ -12,6 +12,7 @@ const User = new mongoose.Schema({
   // username: { type: String },
   password: { type: String, default: "" },
   refreshToken: { type: [String], default: [] },
+  codeType: { type: String, required: true },
   // dateOfBirth: { type: Date },
   artistDesc: { type: String, default: "" },
   gender: { type: String },

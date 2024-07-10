@@ -11,6 +11,8 @@ const authRouter = require("./routes/auth.routes");
 const songRouter = require("./routes/song.routes");
 const playlistRouter = require("./routes/playlist.routes");
 const userRouter = require("./routes/user.routes");
+const libraryRouter = require("./routes/library.routes");
+const categoryRouter = require("./routes/category.routes");
 
 dotenv.config();
 const app = express();
@@ -35,10 +37,12 @@ app.use(
 );
 
 //Setup routes
+app.use("/api/library", libraryRouter);
 app.use("/api/auth", authRouter);
 app.use("/api/songs", songRouter);
 app.use("/api/playlists", playlistRouter);
 app.use("/api/users", userRouter);
+app.use("/api/categories", categoryRouter);
 
 app.listen(PORT, () => {
   console.log("listening on port " + PORT);

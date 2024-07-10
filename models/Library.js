@@ -10,7 +10,6 @@ const Library = new mongoose.Schema({
   playlists: [{ type: ObjectId, ref: "playlist" }],
   artists: [{ type: ObjectId, ref: "artist" }],
   songs: [{ type: ObjectId, ref: "song" }],
-  favoriteSongs: [{ type: ObjectId, ref: "song" }],
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },
 });

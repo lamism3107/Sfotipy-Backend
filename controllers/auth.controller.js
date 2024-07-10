@@ -7,23 +7,6 @@ const userController = require("./user.controller");
 const jwt = require("jsonwebtoken");
 dotenv.config();
 
-const sessionPersist = async (req, res) => {
-  const id = req.body.userId;
-  try {
-    const user = await User.findById(id);
-    return res.status(200).json({
-      success: true,
-      message: "session persist successfully!",
-      data: user,
-    });
-  } catch (err) {
-    return res.status(500).json({
-      success: false,
-      message: err.message,
-      data: null,
-    });
-  }
-};
 const register = async (req, res) => {
   const { email, password, name, gender } = req.body;
 
@@ -46,6 +29,7 @@ const register = async (req, res) => {
         password: hashPassword,
         gender: gender,
         role: "listener",
+        codeType: "user",
       });
 
       //Trả về userData mà ko truyền vào password
@@ -194,6 +178,7 @@ const requestRefreshToken = async (req, res) => {
     { _id: currentUserId },
     { _id: 0, refreshToken: 1 }
   );
+  console.log("check refreshToken", refreshTokenArray);
   //Check xem refresh token có phải của chính user không
   if (!refreshTokenArray.refreshToken.includes(refreshToken)) {
     return res.status(403).json({
@@ -265,12 +250,9 @@ const requestRefreshToken = async (req, res) => {
 const logout = async (req, res) => {
   //Logout => Xoá hết token
   let refreshToken = req.cookies.refreshToken;
-  console.log("check refresh token", refreshToken);
   const id = req.body.id;
-
   try {
     //Xoá  refreshToken trong DB
-
     let refreshTokenArray = await User.findOne(
       { _id: id },
       { _id: 0, refreshToken: 1 }
@@ -278,7 +260,6 @@ const logout = async (req, res) => {
     refreshTokenArray = refreshTokenArray.refreshToken.filter(
       (token) => token !== refreshToken
     );
-    console.log("check change", refreshTokenArray);
 
     await User.updateOne(
       { _id: id },
@@ -348,7 +329,4 @@ module.exports = {
   requestRefreshToken,
   logout,
   logoutGG,
-  sessionPersist,
-  // verify,
-  // refreshToken,
 };

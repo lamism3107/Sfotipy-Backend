@@ -3,10 +3,15 @@ const ObjectId = mongoose.Schema.ObjectId;
 
 const Playlist = new mongoose.Schema({
   name: { type: String, required: true },
-  thumbnail: { type: String, required: true },
+  thumbnail: { type: String },
   owner: { type: ObjectId, ref: "user", required: true },
-  songs: [{ type: ObjectId, ref: "song" }],
-  isAlbum: { type: Boolean, default: false },
+  songs: [
+    {
+      songId: { type: ObjectId, ref: "song" },
+      addDate: { type: Date, default: Date.now() },
+    },
+  ],
+  codeType: { type: String, required: true },
   artist: { type: ObjectId, ref: "user" },
   collaborators: [{ type: ObjectId, ref: "user" }],
   description: { type: String, default: "" },

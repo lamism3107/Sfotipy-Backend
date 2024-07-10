@@ -3,25 +3,43 @@ const router = express.Router();
 const libraryController = require("../controllers/library.controller");
 const authMiddleware = require("../utils/authMiddleware");
 
-router.post(
-  "/",
-  authMiddleware.verifyAccessToken,
-  libraryController.createNewLibrary
-);
+router.post("/", libraryController.createNewLibrary);
 router.get(
   "/",
   authMiddleware.verifyAccessToken,
-  libraryController.getMyLibrary
+  libraryController.getLibraryData
 );
-router.post(
-  "/addSong",
+
+router.put(
+  "/playlist/:playlistId",
   authMiddleware.verifyAccessToken,
-  libraryController.addSongToPlaylist
+  libraryController.addPlaylistToLibrary
+);
+router.put(
+  "/song/:songId",
+  authMiddleware.verifyAccessToken,
+  libraryController.addSongToLibrary
+);
+router.get(
+  "/:type",
+  authMiddleware.verifyAccessToken,
+  libraryController.searchItemInLibrary
+);
+router.put(
+  "/artists/:artistId",
+  authMiddleware.verifyAccessToken,
+  libraryController.addArtistToLibrary
 );
 router.delete(
-  "/:id",
+  "/playlists/:playlistId",
   authMiddleware.verifyAccessToken,
-  libraryController.deletePlaylist
+  libraryController.deletePlaylistFromLibrary
+);
+
+router.delete(
+  "/songs/:songId",
+  authMiddleware.verifyAccessToken,
+  libraryController.deleteSongFromLibrary
 );
 
 module.exports = router;

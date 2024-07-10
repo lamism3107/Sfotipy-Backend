@@ -1,10 +1,46 @@
 const Playlist = require("../models/Playlist");
+const SongModel = require("../models/Song");
+const UserModel = require("../models/User");
 const User = require("../models/User");
+
+const getAllPlaylists = async (req, res) => {
+  const type = req.params.type;
+  console.log(type);
+  try {
+    if (type === "all") {
+      const playlists = await Playlist.find().sort({ createdAt: "desc" });
+      if (playlists) {
+        return res.status(200).json({
+          success: true,
+          message: "Get all playlists successfully!",
+          data: playlists,
+        });
+      }
+    } else {
+      const playlists = await Playlist.find({
+        codeType: type,
+      }).sort({ createdAt: "desc" });
+      if (playlists) {
+        return res.status(200).json({
+          success: true,
+          message: "Get all playlists successfully!",
+          data: playlists,
+        });
+      }
+    }
+  } catch (err) {
+    return res.status(500).json({
+      success: false,
+      message: `Error from server: ${err.message}`,
+      data: null,
+    });
+  }
+};
 
 const createNewPlaylist = async (req, res) => {
   const currentUser = req.user;
-  const { name, thumbnail, songs, isAlbum, artist } = req.body;
-  if (!name || !thumbnail || !songs) {
+  const { name, songs, thumbnail, codeType, artist, description } = req.body;
+  if (!name || !songs) {
     return res.status(301).json({
       success: false,
       message: "Missing required fields",
@@ -13,24 +49,38 @@ const createNewPlaylist = async (req, res) => {
   }
   const playlistData = {
     name,
-    thumbnail,
     songs,
+    codeType,
+    thumbnail,
     owner: currentUser.id,
-    isAlbum,
     artist,
+    description,
     collaborators: [],
   };
   const playlist = await Playlist.create(playlistData);
+  const playlistToReturn = await Playlist.findById(playlist._id).populate({
+    path: "owner",
+    model: UserModel,
+    select: "name",
+  });
   return res.status(200).json({
     success: true,
     message: "Playlist created successfully",
-    data: playlist,
+    data: playlistToReturn,
   });
 };
 
 const getPlaylistById = async (req, res) => {
   const playlistId = req.params.id;
   await Playlist.findById({ _id: playlistId })
+    .populate({ path: "owner", model: UserModel, select: "name" })
+    .populate({
+      path: "songs",
+      populate: {
+        path: "songId",
+        model: SongModel,
+      },
+    })
     .then((playlist) => {
       if (playlist) {
         return res.status(200).json({
@@ -57,14 +107,14 @@ const getPlaylistById = async (req, res) => {
 
 const addSongToPlaylist = async (req, res) => {
   const currentUser = req.user;
-  const { playlistId, songId } = req.body;
-
+  const playlistId = req.params.id;
+  const songId = req.body.songId;
   try {
-    const playlist = await Playlist.findOne({ _id: playlistId });
+    const playlist = await Playlist.findById(playlistId);
     if (playlist) {
       if (
-        playlist.owner !== currentUser._id &&
-        playlist.collaborators.includes(currentUser._id)
+        playlist.owner !== currentUser.id &&
+        playlist.collaborators.includes(currentUser.id)
       ) {
         return res.status(400).json({
           success: false,
@@ -73,23 +123,27 @@ const addSongToPlaylist = async (req, res) => {
         });
       }
     }
-    const songToAdd = await Playlist.findOne({ id: songId });
-    if (songToAdd) {
-      if (playlist.songs.includes(songId)) {
-        return res.status(400).json({
-          success: false,
-          message: "Song already added to playlist",
-          data: null,
-        });
-      } else {
-        playlist.songs.push(songId);
-        await playlist.save();
-        return res.status(200).json({
-          success: true,
-          message: "Playlist added to playlist successfully",
-          data: playlist,
-        });
+    const songToAdd = await SongModel.findByIdAndUpdate(
+      songId,
+      {
+        album: playlistId,
+      },
+      {
+        returnDocument: "after",
       }
+    );
+    if (songToAdd) {
+      const currentDate = new Date();
+      playlist.songs.push({
+        songId: songId,
+        addDate: currentDate,
+      });
+      await playlist.save();
+      return res.status(200).json({
+        success: true,
+        message: "Playlist added to playlist successfully",
+        data: playlist,
+      });
     }
   } catch (err) {
     return res.status(500).json({
@@ -115,10 +169,13 @@ const updatePlaylist = async (req, res) => {
       }
     );
     if (updatedPlaylist) {
+      const returningPlaylist = await Playlist.findById({
+        _id: playlistId,
+      }).populate({ path: "owner", model: UserModel, select: "name" });
       return res.status(200).json({
         success: true,
         message: "Update playlist successfully",
-        data: updatedPlaylist,
+        data: returningPlaylist,
       });
     } else {
       return res.status(200).json({
@@ -160,10 +217,41 @@ async function deletePlaylist(req, res) {
     });
   }
 }
+
+const getSongsOfPlaylist = async () => {
+  const playlistId = req.params.playlistId;
+  try {
+    const playlist = await Playlist.findById(playlistId).populate({
+      path: "songs",
+      model: SongModel,
+    });
+    if (playlist) {
+      return res.status(200).json({
+        success: true,
+        message: "Get songs of playlist successfully",
+        data: playlist.songs,
+      });
+    } else {
+      return res.status(404).json({
+        success: false,
+        message: "Playlist not found",
+        data: null,
+      });
+    }
+  } catch (e) {
+    return res.status(500).json({
+      success: false,
+      message: `Error from server: ${e.message}`,
+      data: null,
+    });
+  }
+};
 module.exports = {
   createNewPlaylist,
   getPlaylistById,
+  getAllPlaylists,
   addSongToPlaylist,
   deletePlaylist,
   updatePlaylist,
+  getSongsOfPlaylist,
 };
