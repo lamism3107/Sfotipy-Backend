@@ -44,7 +44,7 @@ app.use("/api/playlists", playlistRouter);
 app.use("/api/users", userRouter);
 app.use("/api/categories", categoryRouter);
 
-app.use("/", (req, res) => {
+app.get("/", (req, res) => {
   res.send("API is running");
 });
 
