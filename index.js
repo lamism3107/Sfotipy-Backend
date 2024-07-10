@@ -45,7 +45,7 @@ app.use("/api/users", userRouter);
 app.use("/api/categories", categoryRouter);
 
 app.get("/", (req, res) => {
-  res.send("API is running");
+  return res.send("API is running successfully");
 });
 
 app.listen(PORT, () => {

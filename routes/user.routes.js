@@ -25,7 +25,7 @@ router.get(
 );
 router.get(
   "/:id/songs",
-  authMiddleware.verifyAc,
+  authMiddleware.verifyAccessToken,
   userController.getAllSongsOfUser
 );
 
