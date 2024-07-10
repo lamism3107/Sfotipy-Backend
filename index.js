@@ -44,6 +44,10 @@ app.use("/api/playlists", playlistRouter);
 app.use("/api/users", userRouter);
 app.use("/api/categories", categoryRouter);
 
+app.use("/", (req, res) => {
+  res.send("API is running");
+});
+
 app.listen(PORT, () => {
   console.log("listening on port " + PORT);
 });
