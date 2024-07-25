@@ -12,7 +12,7 @@ const songRouter = require("./routes/song.routes");
 const playlistRouter = require("./routes/playlist.routes");
 const userRouter = require("./routes/user.routes");
 const libraryRouter = require("./routes/library.routes");
-const categoryRouter = require("./routes/category.routes");
+const genreRouter = require("./routes/genre.routes");
 
 dotenv.config();
 const app = express();
@@ -30,8 +30,11 @@ app.use(bodyParser.urlencoded({ extended: true }));
 //Setup cors
 app.use(
   cors({
-    // origin: "http://localhost:3000",
-    origin: "https://sfotipy-frontend.vercel.app", //Chan tat ca cac domain khac ngoai domain nay
+    //Chan tat ca cac domain khac ngoai domain nay
+    origin: "http://localhost:3000",
+
+    //Production domain
+    // origin: "https://sfotipy-frontend.vercel.app",
     credentials: true, //Để bật cookie HTTP qua CORS
   })
 );
@@ -42,7 +45,7 @@ app.use("/api/auth", authRouter);
 app.use("/api/songs", songRouter);
 app.use("/api/playlists", playlistRouter);
 app.use("/api/users", userRouter);
-app.use("/api/categories", categoryRouter);
+app.use("/api/genres", genreRouter);
 
 app.get("/", (req, res) => {
   return res.send("API is running successfully");

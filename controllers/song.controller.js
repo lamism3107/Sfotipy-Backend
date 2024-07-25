@@ -1,28 +1,44 @@
+const GenreModel = require("../models/Genre");
 const Song = require("../models/Song");
+const UserModel = require("../models/User");
 const User = require("../models/User");
 
 const createNewSong = async (req, res) => {
-  const { name, thumbnail, songURL, codeType, language, categoryList } =
-    req.body;
-  if (!name || !thumbnail || !songURL || !language) {
+  let {
+    name,
+    thumbnail,
+    album,
+    artists,
+    composers,
+    producers,
+    songURL,
+    language,
+    genres,
+    description,
+  } = req.body;
+  if (!name || !artists || !thumbnail || !songURL || !language) {
     return res.status(301).json({
       success: false,
-      message: "All fields are required",
+      message: "Missing required fields",
       data: null,
     });
   }
   let owner = req.user.id;
-  let artists = [req.user.id];
+  let playCount = 0;
 
   const songDetails = {
     name,
     thumbnail,
-    codeType,
+    album,
     songURL,
     artists,
+    composers,
+    producers,
+    playCount,
+    description,
     language,
     owner,
-    categoryList,
+    genres,
   };
   const createdSong = await Song.create(songDetails);
   return res.status(200).json({
@@ -91,9 +107,13 @@ const getAllSongs = async (req, res) => {
 };
 const getSongById = async (req, res) => {
   let songId = req.params.id;
-  const filter = { _id: songId };
   try {
-    let song = await Song.findOne(filter);
+    let song = await Song.findById(songId).populate([
+      { path: "owner", model: UserModel, select: "name" },
+      { path: "artists", model: UserModel, select: "name" },
+      ,
+      { path: "genres", model: GenreModel, select: "name" },
+    ]);
     if (song) {
       return res.status(200).json({
         success: true,

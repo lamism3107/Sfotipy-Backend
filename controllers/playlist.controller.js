@@ -1,13 +1,14 @@
+const GenreModel = require("../models/Genre");
 const Playlist = require("../models/Playlist");
 const SongModel = require("../models/Song");
 const UserModel = require("../models/User");
 const User = require("../models/User");
 
 const getAllPlaylists = async (req, res) => {
-  const type = req.params.type;
+  const type = req.query.type;
   console.log(type);
   try {
-    if (type === "all") {
+    if (type === "All") {
       const playlists = await Playlist.find().sort({ createdAt: "desc" });
       if (playlists) {
         return res.status(200).json({
@@ -108,7 +109,7 @@ const getPlaylistById = async (req, res) => {
 const addSongToPlaylist = async (req, res) => {
   const currentUser = req.user;
   const playlistId = req.params.id;
-  const songId = req.body.songId;
+  const songId = req.params.songId;
   try {
     const playlist = await Playlist.findById(playlistId);
     if (playlist) {
@@ -156,18 +157,31 @@ const addSongToPlaylist = async (req, res) => {
 
 const updatePlaylist = async (req, res) => {
   const playlistId = req.params.id;
+  let updatedPlaylist = null;
   try {
-    const updatedPlaylist = await Playlist.findByIdAndUpdate(
-      playlistId,
-      {
-        name: req.body.name,
-        thumbnail: req.body.thumbnail,
-        description: req.body.description,
-      },
-      {
-        returnDocument: "after",
-      }
-    );
+    if (!req.body.name && !req.body.description) {
+      updatedPlaylist = await Playlist.findByIdAndUpdate(
+        playlistId,
+        {
+          thumbnail: req.body.thumbnail,
+        },
+        {
+          returnDocument: "after",
+        }
+      );
+    } else {
+      updatedPlaylist = await Playlist.findByIdAndUpdate(
+        playlistId,
+        {
+          name: req.body.name,
+          thumbnail: req.body.thumbnail,
+          description: req.body.description,
+        },
+        {
+          returnDocument: "after",
+        }
+      );
+    }
     if (updatedPlaylist) {
       const returningPlaylist = await Playlist.findById({
         _id: playlistId,
@@ -223,7 +237,12 @@ const getSongsOfPlaylist = async () => {
   try {
     const playlist = await Playlist.findById(playlistId).populate({
       path: "songs",
-      model: SongModel,
+      populate: { path: "owner", model: UserModel, select: "name" },
+      populate: { path: "artists", model: UserModel, select: "name" },
+      populate: { path: "producers", model: UserModel, select: "name" },
+      populate: { path: "composers", model: UserModel, select: "name" },
+      populate: { path: "genres", model: UserModel, select: "name" },
+      model: GenreModel,
     });
     if (playlist) {
       return res.status(200).json({

@@ -3,11 +3,11 @@ const router = express.Router();
 const playlistController = require("../controllers/playlist.controller");
 const authMiddleware = require("../utils/authMiddleware");
 
-// router.get(
-//   "/:type",
-//   authMiddleware.verifyAccessToken,
-//   playlistController.getAllPlaylists
-// );
+router.get(
+  "/",
+  authMiddleware.verifyAccessToken,
+  playlistController.getAllPlaylists
+);
 router.post(
   "/",
   authMiddleware.verifyAccessToken,
@@ -18,8 +18,8 @@ router.get(
   authMiddleware.verifyAccessToken,
   playlistController.getPlaylistById
 );
-router.post(
-  "/:id/songs",
+router.put(
+  "/:id/songs/:songId",
   authMiddleware.verifyAccessToken,
   playlistController.addSongToPlaylist
 );

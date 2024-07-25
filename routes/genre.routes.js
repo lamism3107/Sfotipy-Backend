@@ -1,21 +1,22 @@
 const express = require("express");
 const router = express.Router();
-const categoryController = require("../controllers/category.controller");
+const genreController = require("../controllers/genre.controller");
 const authMiddleware = require("../utils/authMiddleware");
 
 router.post(
   "/",
   authMiddleware.verifyAccessToken,
-  categoryController.createNewCategory
+  genreController.createNewGenre
 );
 router.get(
   "/:id",
   authMiddleware.verifyAccessToken,
-  categoryController.getCategoryById
+  genreController.getGenreById
 );
-router.get(
-  "/",
+router.delete(
+  "/:id",
   authMiddleware.verifyAccessToken,
-  categoryController.getAllCategries
+  genreController.deleteGenre
 );
+router.get("/", authMiddleware.verifyAccessToken, genreController.getAllGenres);
 module.exports = router;
